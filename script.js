@@ -3,6 +3,23 @@ window.addEventListener('load', function() {
     setTimeout(() => {
         document.getElementById('loading').classList.add('fade-out');
     }, 1000);
+
+    // Set initial ARIA attributes for accessibility for hamburger menu
+    const hamburgerForAria = document.getElementById('hamburger');
+    const navMenuForAria = document.getElementById('nav-menu');
+    if (hamburgerForAria && navMenuForAria) {
+        hamburgerForAria.setAttribute('aria-controls', 'nav-menu');
+        hamburgerForAria.setAttribute('aria-expanded', 'false');
+    }
+
+    // Initialize AOS (Animate On Scroll)
+    if (typeof AOS !== 'undefined') {
+        AOS.init({
+            duration: 800, // values from 0 to 3000, with step 50ms
+            once: true, // whether animation should happen only once - while scrolling down
+            offset: 100 // offset (in px) from the original trigger point
+        });
+    }
 });
 
 // Header scroll effect
@@ -20,14 +37,16 @@ const hamburger = document.getElementById('hamburger');
 const navMenu = document.getElementById('nav-menu');
 
 hamburger.addEventListener('click', function() {
-    hamburger.classList.toggle('active');
+    const isActive = hamburger.classList.toggle('active');
     navMenu.classList.toggle('active');
+    hamburger.setAttribute('aria-expanded', isActive ? 'true' : 'false');
 });
 
 // Close mobile menu when clicking on a link
 document.querySelectorAll('.nav-menu a').forEach(n => n.addEventListener('click', () => {
     hamburger.classList.remove('active');
     navMenu.classList.remove('active');
+    hamburger.setAttribute('aria-expanded', 'false');
 }));
 
 // Smooth scrolling for internal links with offset for fixed header
@@ -47,10 +66,13 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             });
             
             // Close mobile menu if open
-            const hamburger = document.getElementById('hamburger');
-            const navMenu = document.getElementById('nav-menu');
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
+            const hamburger = document.getElementById('hamburger'); // Ensure we're using the already defined const
+            const navMenu = document.getElementById('nav-menu'); // Ensure we're using the already defined const
+            if (hamburger.classList.contains('active')) { // Check if it's actually open before changing attributes
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+                hamburger.setAttribute('aria-expanded', 'false');
+            }
         }
     });
 });
